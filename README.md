@@ -1,62 +1,159 @@
-# Dictto
+<p align="center">
+  <img src="packages/brand/src/logos/app-icon.svg" width="128" height="128" alt="Dictto — Voice to Text for Windows" />
+</p>
 
-**Voice-to-text for Windows. Hold a hotkey, speak, release — clean text appears at your cursor.**
+<h1 align="center">Dictto</h1>
 
-[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![GitHub Release](https://img.shields.io/github/v/release/dictto-app/dictto)](https://github.com/dictto-app/dictto/releases/latest)
+<p align="center">
+  <strong>Free, open source voice-to-text for Windows.</strong><br>
+  Hold a hotkey, speak, release — clean text appears at your cursor. Everywhere.
+</p>
 
-<!-- TODO: Add demo GIF/video here -->
+<p align="center">
+  <a href="https://github.com/dictto-app/dictto/releases/latest"><img src="https://img.shields.io/github/v/release/dictto-app/dictto?style=flat-square&label=Download&color=c4f040" alt="Latest Release"></a>&nbsp;
+  <a href="https://github.com/dictto-app/dictto/releases"><img src="https://img.shields.io/github/downloads/dictto-app/dictto/total?style=flat-square&color=333" alt="Total Downloads"></a>&nbsp;
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--v3-blue?style=flat-square" alt="License: AGPL v3"></a>&nbsp;
+  <a href="https://github.com/dictto-app/dictto/actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/dictto-app/dictto/release.yml?style=flat-square&label=build" alt="Build Status"></a>
+</p>
+
+<p align="center">
+  <a href="#install">Install</a> · <a href="#how-it-works">How It Works</a> · <a href="#features">Features</a> · <a href="#build-from-source">Build</a> · <a href="CONTRIBUTING.md">Contributing</a>
+</p>
+
+<br>
+
+<!-- TODO: Replace with demo GIF/video — record a 15-second clip showing the full flow -->
+<!-- <p align="center"><img src="docs/assets/demo.gif" width="720" alt="Dictto demo — voice to text in action"></p> -->
+
+## Why Dictto?
+
+Most voice-to-text tools are closed source, expensive, or send your data to servers you don't control. Dictto is different:
+
+- **Your keys, your data** — Bring your own OpenAI API key (BYOK). Audio goes directly from your device to OpenAI. No middleman, no Dictto servers.
+- **Actually private** — Zero telemetry, zero analytics, zero accounts. Your API key is stored in Windows Credential Locker. [Read our privacy policy →](PRIVACY.md)
+- **Works everywhere** — Any text field in any app. VS Code, Slack, Notepad, Chrome, Word, Telegram — if you can type there, Dictto can paste there.
+- **Open source** — Fully auditable. AGPL-3.0 licensed. You can read every line of code that touches your microphone and your clipboard.
+
+> If you've used [Whisper Flow](https://github.com/), [SuperWhisper](https://superwhisper.com/), [Wispr Flow](https://wisprflow.com/), or other AI dictation tools and wanted something open source, private, and free — Dictto is built for you.
+
+## How It Works
+
+Dictto uses a push-to-talk model. No always-on microphone, no wake words, no background listening.
+
+| Step | What happens |
+|:---:|---|
+| **1. Press** | Hold `Ctrl + Win` — Dictto starts recording from your microphone |
+| **2. Speak** | Talk naturally. A floating waveform bar shows you it's listening |
+| **3. Release** | Let go — audio is sent to OpenAI Whisper for transcription |
+| **4. Done** | AI cleans up filler words, fixes grammar, and pastes the text at your cursor |
+
+The entire flow takes about 1–2 seconds after you stop speaking. Audio is never saved to disk.
 
 ## Features
 
-- **Push-to-talk**: Hold `Ctrl+Win`, speak, release — text is pasted where your cursor is
-- **Works everywhere**: Any text field in any app (VS Code, Slack, Notepad, browsers)
-- **Smart cleanup**: AI removes filler words ("um", "uh"), fixes grammar, formats text
-- **Spanglish support**: Handles mixed Spanish/English naturally
-- **BYOK (Bring Your Own Key)**: Use your own OpenAI API key — your data, your control
-- **Lightweight**: ~15MB installer, minimal resource usage (built with Tauri + Rust)
-- **Privacy-first**: Audio is processed and discarded — never stored
+- **Push-to-talk** — `Ctrl + Win` hotkey. Speak only when you want. No always-on microphone.
+- **AI text cleanup** — GPT removes "um", "uh", "like", fixes grammar, and formats your text naturally.
+- **102 languages** — Supports all languages available in OpenAI Whisper, including mixed-language dictation (Spanglish, Franglais, etc.).
+- **Lightweight** — ~5 MB installer. Built with Tauri + Rust, not Electron. Minimal CPU and memory usage.
+- **Smart clipboard** — Saves your clipboard before pasting, restores it after. Your clipboard history stays intact.
+- **Auto-start** — Optionally starts with Windows and lives quietly in your system tray.
+- **Transcription history** — All your transcriptions are saved locally in a SQLite database for your reference.
+- **Fully offline-capable architecture** — The app itself runs locally. Only the API calls go to OpenAI (using your key).
 
 ## Install
 
-1. Download the latest `.exe` from [GitHub Releases](https://github.com/dictto-app/dictto/releases/latest)
-2. Run the installer
-3. Windows SmartScreen may show a warning — click "More info" then "Run anyway" (we're working on code signing)
-4. Open Dictto from the system tray
-5. Go to Settings > API and enter your OpenAI API key
-6. Hold `Ctrl+Win` and start talking!
+### Download
 
-## Build from source
+Download the latest installer from **[GitHub Releases](https://github.com/dictto-app/dictto/releases/latest)**.
 
-**Prerequisites:** Node.js (LTS), pnpm, Rust (stable), Tauri CLI
+### Setup
+
+1. Run `Dictto_x64-setup.exe`
+2. Open Dictto from the system tray (bottom-right of your taskbar)
+3. Go to **Settings → API** and enter your [OpenAI API key](https://platform.openai.com/api-keys)
+4. Hold `Ctrl + Win` and start talking
+
+### Windows SmartScreen
+
+> [!NOTE]
+> **You may see a "Windows protected your PC" screen.** This is expected and safe — here's why.
+>
+> Windows SmartScreen flags apps that are **not code-signed with a paid certificate**. Most open source projects — including Dictto — don't have one yet because certificates cost hundreds of dollars per year.
+>
+> **This is not a virus warning.** It's a "we don't recognize this publisher" warning. Dictto is fully open source — you can [audit every line of code](https://github.com/dictto-app/dictto) that runs on your machine.
+>
+> **To install:**
+> 1. Click **"More info"** (the small text link, not the button)
+> 2. Click **"Run anyway"**
+>
+> We are applying for a free code signing certificate through [SignPath Foundation](https://signpath.org/) (used by major open source projects). Once approved, this warning will disappear.
+>
+> **Verify your download:** Every release includes SHA-256 checksums. Compare with:
+> ```powershell
+> certutil -hashfile Dictto_0.1.0_x64-setup.exe SHA256
+> ```
+
+## Privacy
+
+Dictto is designed to be private by default:
+
+| | |
+|---|---|
+| **Telemetry** | None. Zero analytics, zero crash reports, zero tracking. |
+| **Audio** | Sent directly to OpenAI via your API key. Never stored on disk. Never sent to Dictto. |
+| **API key** | Stored in Windows Credential Locker (OS-level encryption). Never logged or transmitted. |
+| **Accounts** | None required. No sign-up, no email, no database. |
+| **Data storage** | Settings and transcription history stored locally in `%LOCALAPPDATA%`. |
+
+Read the full [Privacy Policy →](PRIVACY.md)
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Desktop framework** | [Tauri v2](https://v2.tauri.app/) (Rust backend + WebView frontend) |
+| **Frontend** | React 19 + TypeScript + TailwindCSS v4 |
+| **Audio capture** | WASAPI (native Windows audio via Microsoft `windows` crate) |
+| **Transcription** | [OpenAI Whisper API](https://platform.openai.com/docs/guides/speech-to-text) (BYOK) |
+| **Text cleanup** | [OpenAI GPT](https://platform.openai.com/docs/guides/text-generation) (BYOK) |
+| **Local storage** | SQLite (settings + history) + Windows Credential Locker (API key) |
+
+## Build from Source
+
+**Prerequisites:** [Node.js](https://nodejs.org/) (LTS), [pnpm](https://pnpm.io/), [Rust](https://rustup.rs/) (stable), [Tauri CLI prerequisites](https://v2.tauri.app/start/prerequisites/)
 
 ```bash
 git clone https://github.com/dictto-app/dictto.git
 cd dictto
 pnpm install
-pnpm dev        # Development mode with hot-reload
-pnpm build      # Production build (outputs .exe installer)
+pnpm dev          # Development mode with hot-reload
+pnpm build        # Production build (.exe installer)
 ```
 
-## How it works
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed setup instructions.
 
-1. **Hotkey press** (`Ctrl+Win`) — starts recording from your microphone
-2. **Hotkey release** — stops recording, sends audio to OpenAI Whisper API for transcription
-3. **AI cleanup** — GPT removes filler words, fixes grammar, formats text
-4. **Text injection** — cleaned text is pasted at your cursor via clipboard
+## Alternatives
 
-## Tech stack
+Looking for voice-to-text on other platforms or with different trade-offs? Here are some alternatives:
 
-- **Frontend:** React + TypeScript + TailwindCSS
-- **Backend:** Rust (Tauri v2)
-- **Transcription:** OpenAI Whisper API (BYOK)
-- **Text cleanup:** OpenAI GPT (BYOK)
-- **Audio:** CPAL (native Rust audio capture)
+| App | Platform | Open Source | Price | Key Difference |
+|---|---|---|---|---|
+| **Dictto** | Windows | Yes (AGPL-3.0) | Free (BYOK) | Push-to-talk, local-first, your own API key |
+| [Wispr Flow](https://wisprflow.com/) | macOS, Windows | No | $10/mo | Closed source, subscription model |
+| [SuperWhisper](https://superwhisper.com/) | macOS | No | $10/mo | macOS only, local Whisper model option |
+| [Whisper Writer](https://github.com/savbell/whisper-writer) | Windows, Linux | Yes | Free | Python-based, local Whisper, no text cleanup |
+| [Buzz](https://github.com/chidiwilliams/buzz) | Cross-platform | Yes | Free | Transcription GUI, not push-to-talk dictation |
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions and guidelines.
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions and guidelines.
 
 ## License
 
-[AGPL-3.0](LICENSE) — you can use, modify, and distribute Dictto freely. If you modify it and distribute or run it as a service, you must share your changes under the same license.
+[AGPL-3.0](LICENSE) — You can use, modify, and distribute Dictto freely. If you modify it and offer it as a service, you must share your changes under the same license.
+
+<br>
+
+<p align="center">
+  Built with <a href="https://v2.tauri.app/">Tauri</a> and <a href="https://www.rust-lang.org/">Rust</a>.
+</p>
