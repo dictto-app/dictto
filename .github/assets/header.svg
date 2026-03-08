@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 200" fill="none">
+  <!-- Warm light background with rounded corners (brand --bg-light #f2ebe1, radius-xl 16px) -->
+  <rect width="640" height="200" rx="16" ry="16" fill="#f2ebe1"/>
+
+  <!-- Subtle warm border -->
+  <rect width="640" height="200" rx="16" ry="16" fill="none" stroke="rgba(26,26,26,0.08)" stroke-width="1"/>
+
+  <!-- App icon (centered, 80x80) -->
+  <defs>
+    <mask id="waveform">
+      <rect x="280" y="24" width="80" height="80" fill="white"/>
+      <rect x="313.3" y="37.3" width="2.67" height="24" rx="1.33" fill="black"/>
+      <rect x="318.7" y="33.3" width="2.67" height="32" rx="1.33" fill="black"/>
+      <rect x="324" y="38.7" width="2.67" height="21.3" rx="1.33" fill="black"/>
+    </mask>
+  </defs>
+
+  <!-- Squircle background -->
+  <rect x="280" y="24" width="80" height="80" rx="20.8" ry="20.8" fill="#12110f"/>
+
+  <!-- D + waveform mark -->
+  <path d="M304 38.7H318.7C334.7 38.7 345.3 49.3 345.3 64C345.3 78.7 334.7 89.3 318.7 89.3H304V38.7Z"
+        fill="#ededf0" mask="url(#waveform)"/>
+
+  <!-- Wordmark "Dictto" — Figtree 700, warm charcoal -->
+  <text x="320" y="140" text-anchor="middle"
+        font-family="'Figtree', 'Inter', system-ui, -apple-system, sans-serif"
+        font-weight="700" font-size="32" letter-spacing="-0.5"
+        fill="#12110f">Dictto</text>
+
+  <!-- Tagline -->
+  <text x="320" y="168" text-anchor="middle"
+        font-family="'Figtree', 'Inter', system-ui, -apple-system, sans-serif"
+        font-weight="400" font-size="14" letter-spacing="0"
+        fill="#6b6560">Voice-to-text for Windows</text>
+</svg>

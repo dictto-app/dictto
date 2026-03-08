@@ -1,8 +1,6 @@
 <p align="center">
-  <img src="packages/brand/src/logos/app-icon.svg" width="128" height="128" alt="Dictto — Voice to Text for Windows" />
+  <img src=".github/assets/header.svg" width="640" alt="Dictto — Voice to Text for Windows" />
 </p>
-
-<h1 align="center">Dictto</h1>
 
 <p align="center">
   <strong>Free, open source voice-to-text for Windows.</strong><br>
@@ -34,7 +32,7 @@ Most voice-to-text tools are closed source, expensive, or send your data to serv
 - **Works everywhere** — Any text field in any app. VS Code, Slack, Notepad, Chrome, Word, Telegram — if you can type there, Dictto can paste there.
 - **Open source** — Fully auditable. AGPL-3.0 licensed. You can read every line of code that touches your microphone and your clipboard.
 
-> If you've used [Whisper Flow](https://github.com/), [SuperWhisper](https://superwhisper.com/), [Wispr Flow](https://wisprflow.com/), or other AI dictation tools and wanted something open source, private, and free — Dictto is built for you.
+> If you've used [Wispr Flow](https://wisprflow.ai/), [SuperWhisper](https://superwhisper.com/), or other AI dictation tools and wanted something open source, private, and free — Dictto is built for you.
 
 ## How It Works
 
@@ -139,8 +137,8 @@ Looking for voice-to-text on other platforms or with different trade-offs? Here 
 | App | Platform | Open Source | Price | Key Difference |
 |---|---|---|---|---|
 | **Dictto** | Windows | Yes (AGPL-3.0) | Free (BYOK) | Push-to-talk, local-first, your own API key |
-| [Wispr Flow](https://wisprflow.com/) | macOS, Windows | No | $10/mo | Closed source, subscription model |
-| [SuperWhisper](https://superwhisper.com/) | macOS | No | $10/mo | macOS only, local Whisper model option |
+| [Wispr Flow](https://wisprflow.ai/) | macOS, Windows | No | $12/mo | Closed source, subscription model |
+| [SuperWhisper](https://superwhisper.com/) | macOS, Windows | No | $8.49/mo | Closed source, local Whisper model option |
 | [Whisper Writer](https://github.com/savbell/whisper-writer) | Windows, Linux | Yes | Free | Python-based, local Whisper, no text cleanup |
 | [Buzz](https://github.com/chidiwilliams/buzz) | Cross-platform | Yes | Free | Transcription GUI, not push-to-talk dictation |
 
