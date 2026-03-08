@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Rust
+target/
+
+# Build output
+dist/
+.vite/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tauri
+apps/desktop/src-tauri/gen/
+
+# pnpm
+.pnpm-debug.log*
+
+# Logs
+*.log
+
+# Machine-specific cargo config (MSYS2 linker workaround)
+apps/desktop/src-tauri/.cargo/config.toml
