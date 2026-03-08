@@ -1,6 +1,6 @@
 [package]
 name = "dictto"
-version = "0.3.0"
+version = "0.1.0"
 description = "Voice-to-text desktop app"
 authors = ["Fabian Cronhenko"]
 edition = "2021"
