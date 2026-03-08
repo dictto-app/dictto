@@ -1,5 +1,5 @@
 <p align="center">
-  <img src=".github/assets/header.svg" width="640" alt="Dictto — Voice to Text for Windows" />
+  <img src=".github/assets/header.png" width="640" alt="Dictto — Voice to Text for Windows" />
 </p>
 
 <p align="center">
@@ -15,24 +15,13 @@
 </p>
 
 <p align="center">
-  <a href="#install">Install</a> · <a href="#how-it-works">How It Works</a> · <a href="#features">Features</a> · <a href="#build-from-source">Build</a> · <a href="CONTRIBUTING.md">Contributing</a>
+  <a href="https://github.com/dictto-app/dictto/releases/latest"><b>Download for Windows</b></a> · <a href="#how-it-works">How It Works</a> · <a href="#features">Features</a> · <a href="#build-from-source">Build</a> · <a href="CONTRIBUTING.md">Contributing</a>
 </p>
 
 <br>
 
 <!-- TODO: Replace with demo GIF/video — record a 15-second clip showing the full flow -->
 <!-- <p align="center"><img src="docs/assets/demo.gif" width="720" alt="Dictto demo — voice to text in action"></p> -->
-
-## Why Dictto?
-
-Most voice-to-text tools are closed source, expensive, or send your data to servers you don't control. Dictto is different:
-
-- **Your keys, your data** — Bring your own OpenAI API key (BYOK). Audio goes directly from your device to OpenAI. No middleman, no Dictto servers.
-- **Actually private** — Zero telemetry, zero analytics, zero accounts. Your API key is stored in Windows Credential Locker. [Read our privacy policy →](PRIVACY.md)
-- **Works everywhere** — Any text field in any app. VS Code, Slack, Notepad, Chrome, Word, Telegram — if you can type there, Dictto can paste there.
-- **Open source** — Fully auditable. AGPL-3.0 licensed. You can read every line of code that touches your microphone and your clipboard.
-
-> If you've used [Wispr Flow](https://wisprflow.ai/), [SuperWhisper](https://superwhisper.com/), or other AI dictation tools and wanted something open source, private, and free — Dictto is built for you.
 
 ## How It Works
 
@@ -46,6 +35,15 @@ Dictto uses a push-to-talk model. No always-on microphone, no wake words, no bac
 | **4. Done** | AI cleans up filler words, fixes grammar, and pastes the text at your cursor |
 
 The entire flow takes about 1–2 seconds after you stop speaking. Audio is never saved to disk.
+
+## Why Dictto?
+
+- **Works everywhere** — Any text field in any app. VS Code, Slack, Notepad, Chrome, Word, Telegram — if you can type there, Dictto can paste there.
+- **Your keys, your data** — Bring your own OpenAI API key (BYOK). Audio goes directly from your device to OpenAI. No middleman, no Dictto servers.
+- **Actually private** — Zero telemetry, zero analytics, zero accounts. Your API key lives in Windows Credential Locker. [Read our privacy policy →](PRIVACY.md)
+- **Open source** — Fully auditable. AGPL-3.0 licensed. You can read every line of code that touches your microphone and your clipboard.
+
+> If you've used [Wispr Flow](https://wisprflow.ai/), [SuperWhisper](https://superwhisper.com/), or other AI dictation tools and wanted something open source, private, and free — Dictto is built for you.
 
 ## Features
 
