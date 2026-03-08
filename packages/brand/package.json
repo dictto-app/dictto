@@ -1,0 +1,18 @@
+{
+  "name": "@dictto/brand",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Dictto brand assets — SVG logos, icon generation, design tokens",
+  "type": "module",
+  "exports": {
+    "./logos/*": "./src/logos/*"
+  },
+  "scripts": {
+    "generate:icons": "node scripts/generate-icons.mjs"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "png-to-ico": "^3.0.1",
+    "sharp": "^0.34.5"
+  }
+}

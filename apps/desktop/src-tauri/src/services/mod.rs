@@ -1,0 +1,10 @@
+pub mod audio;
+pub mod autostart;
+pub mod cursor_passthrough;
+pub mod db;
+pub mod hotkey;
+pub mod injector;
+pub mod llm;
+pub mod pipeline;
+pub mod sound;
+pub mod transcription;

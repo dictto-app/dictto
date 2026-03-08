@@ -1,0 +1,14 @@
+{
+  "name": "dictto",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Voice-to-text desktop app for Windows",
+  "scripts": {
+    "dev": "pnpm --filter @dictto/desktop tauri dev",
+    "build": "pnpm --filter @dictto/desktop tauri build",
+    "preview": "pnpm --filter @dictto/desktop preview"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "sharp"]
+  }
+}

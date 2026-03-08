@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <mask id="waveform">
+      <rect width="120" height="120" fill="white"/>
+      <rect x="50" y="42" width="4" height="36" rx="2" fill="black"/>
+      <rect x="58" y="36" width="4" height="48" rx="2" fill="black"/>
+      <rect x="66" y="44" width="4" height="32" rx="2" fill="black"/>
+    </mask>
+  </defs>
+  <!-- Mark for accent (#c4f040) background: fill #12110f -->
+  <path d="M36 22H58C82 22 98 38 98 60C98 82 82 98 58 98H36V22Z"
+        fill="#12110f" mask="url(#waveform)"/>
+</svg>

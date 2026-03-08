@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <mask id="waveform-sm">
+      <rect width="120" height="120" fill="white"/>
+      <rect x="44" y="36" width="9" height="48" rx="4.5" fill="black"/>
+      <rect x="56" y="28" width="9" height="64" rx="4.5" fill="black"/>
+      <rect x="68" y="38" width="9" height="44" rx="4.5" fill="black"/>
+    </mask>
+  </defs>
+  <!-- Tray icon for dark taskbar: black bg, 4px radius, white mark -->
+  <!-- 4px CSS on 32px box = 12.5% → rx 15 in viewBox 120 -->
+  <rect width="120" height="120" rx="15" ry="15" fill="#000000"/>
+  <path d="M26 16H58C88 16 106 36 106 60C106 84 88 104 58 104H26V16Z"
+        fill="white" mask="url(#waveform-sm)"/>
+</svg>
