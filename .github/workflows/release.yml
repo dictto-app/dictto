@@ -11,6 +11,16 @@ jobs:
       contents: write
 
     steps:
+      - name: Detect pre-release
+        id: meta
+        shell: bash
+        run: |
+          if [[ "${{ github.ref_name }}" == *-* ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -46,5 +56,5 @@ jobs:
           releaseName: 'Dictto ${{ github.ref_name }}'
           releaseBody: 'Download the installer below to install Dictto. See [README](https://github.com/dictto-app/dictto#install) for instructions.'
           releaseDraft: false
-          prerelease: false
+          prerelease: ${{ steps.meta.outputs.prerelease == 'true' }}
           includeUpdaterJson: true
