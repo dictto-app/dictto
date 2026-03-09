@@ -21,11 +21,12 @@
 <br>
 
 <p align="center">
-  <video src="https://github.com/dictto-app/dictto/raw/refs/heads/main/.github/assets/demo.mp4" width="720" controls poster="https://github.com/dictto-app/dictto/raw/refs/heads/main/.github/assets/demo-poster.png">
-  </video>
+  <a href="https://github.com/dictto-app/dictto/raw/refs/heads/main/.github/assets/demo.mp4">
+    <img src=".github/assets/demo-poster.png" width="720" alt="Watch Dictto in action — voice to text in 2 seconds" />
+  </a>
 </p>
 <p align="center">
-  <sub>Hold a hotkey, speak, release — text appears at your cursor in ~2 seconds.</sub>
+  <sub><b>▶ Click to watch the demo</b> — Hold a hotkey, speak, release. Text appears at your cursor in ~2 seconds.</sub>
 </p>
 
 <br>
