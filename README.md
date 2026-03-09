@@ -20,8 +20,16 @@
 
 <br>
 
-<!-- TODO: Replace with demo GIF/video — record a 15-second clip showing the full flow -->
-<!-- <p align="center"><img src="docs/assets/demo.gif" width="720" alt="Dictto demo — voice to text in action"></p> -->
+<p align="center">
+  <a href="https://github.com/dictto-app/dictto/blob/main/.github/assets/demo.mp4">
+    <img src=".github/assets/demo-poster.png" width="720" alt="Watch Dictto in action — voice to text in 2 seconds" />
+  </a>
+</p>
+<p align="center">
+  <sub><b>▶ Click to watch the demo</b> — Hold a hotkey, speak, release. Text appears at your cursor in ~2 seconds.</sub>
+</p>
+
+<br>
 
 ## How It Works
 
