@@ -20,14 +20,13 @@
 
 <br>
 
-<p align="center">
-  <a href="https://github.com/dictto-app/dictto/raw/refs/heads/main/.github/assets/demo.mp4">
-    <img src=".github/assets/demo-poster.png" width="720" alt="Watch Dictto in action — voice to text in 2 seconds" />
-  </a>
-</p>
-<p align="center">
-  <sub><b>▶ Click to watch the demo</b> — Hold a hotkey, speak, release. Text appears at your cursor in ~2 seconds.</sub>
-</p>
+<div align="center">
+
+https://github.com/user-attachments/assets/be8bda6e-2b05-43d3-8982-63cf2f811cf2
+
+<sub>Hold a hotkey, speak, release — text appears at your cursor in ~2 seconds.</sub>
+
+</div>
 
 <br>
 
