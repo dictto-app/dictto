@@ -20,13 +20,11 @@
 
 <br>
 
-<div align="center">
-
 https://github.com/user-attachments/assets/be8bda6e-2b05-43d3-8982-63cf2f811cf2
 
-<sub>Hold a hotkey, speak, release — text appears at your cursor in ~2 seconds.</sub>
-
-</div>
+<p align="center">
+  <sub>Hold a hotkey, speak, release — text appears at your cursor in ~2 seconds.</sub>
+</p>
 
 <br>
 
