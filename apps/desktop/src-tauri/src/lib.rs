@@ -3,6 +3,7 @@ mod services;
 mod tray;
 
 use log::LevelFilter;
+use std::sync::Arc;
 use std::sync::Mutex;
 use tauri::Manager;
 use tauri::WebviewUrl;
@@ -12,6 +13,8 @@ pub struct AppState {
     pub audio_recorder: Mutex<services::audio::recorder::AudioRecorder>,
     pub db: Mutex<services::db::Database>,
     pub http_client: reqwest::Client,
+    pub device_monitor: Arc<services::audio::device_monitor::DeviceMonitorState>,
+    pub device_monitor_shutdown: Mutex<Option<std::sync::mpsc::Sender<()>>>,
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -39,6 +42,7 @@ pub fn run() {
         .plugin(tauri_plugin_process::init())
         .invoke_handler(tauri::generate_handler![
             commands::audio::list_microphones,
+            commands::audio::get_current_microphone,
             commands::audio::bar_start_recording,
             commands::audio::bar_stop_recording,
             commands::audio::bar_cancel_recording,
@@ -58,10 +62,26 @@ pub fn run() {
             let db = services::db::Database::new(data_dir)
                 .expect("Failed to initialize database");
 
+            // Spawn device monitor thread (Windows only — cfg guard inside spawn_monitor)
+            let device_monitor_state = Arc::new(
+                services::audio::device_monitor::DeviceMonitorState::new()
+            );
+            #[cfg(windows)]
+            let shutdown_tx = services::audio::device_monitor::spawn_monitor(
+                device_monitor_state.clone(),
+                app.handle().clone(),
+            );
+            #[cfg(not(windows))]
+            let shutdown_tx: Option<std::sync::mpsc::Sender<()>> = None;
+            #[cfg(windows)]
+            let shutdown_tx = Some(shutdown_tx);
+
             app.manage(AppState {
                 audio_recorder: Mutex::new(audio_recorder),
                 db: Mutex::new(db),
                 http_client,
+                device_monitor: device_monitor_state,
+                device_monitor_shutdown: Mutex::new(shutdown_tx),
             });
 
             // Migration: ensure existing auto-start registry entries include --autostart flag

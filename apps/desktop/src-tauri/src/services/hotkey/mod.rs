@@ -2,6 +2,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, OnceLock};
 use tauri::Emitter;
 use tauri::Manager;
+use crate::services::audio::device_monitor::DeviceSelection;
 use crate::services::sound::{play_sound, Sound};
 
 #[cfg(windows)]
@@ -115,8 +116,10 @@ fn emit_state(app: &tauri::AppHandle, state: &str, mode: Option<&str>) {
 /// Returns None for empty/short recordings or stop failures.
 fn stop_recording_sync(app: &tauri::AppHandle) -> Option<Vec<u8>> {
     let t = std::time::Instant::now();
+    log::debug!("[hotkey] stop_recording_sync: acquiring recorder lock...");
     let app_state = app.state::<crate::AppState>();
     let mut recorder = app_state.audio_recorder.lock().unwrap();
+    log::debug!("[hotkey] stop_recording_sync: calling recorder.stop()...");
     let result = match recorder.stop() {
         Ok(data) => {
             log::info!(
@@ -126,13 +129,17 @@ fn stop_recording_sync(app: &tauri::AppHandle) -> Option<Vec<u8>> {
             );
             Some(data)
         }
-        Err(crate::services::audio::recorder::AudioError::EmptyRecording) => None,
+        Err(crate::services::audio::recorder::AudioError::EmptyRecording) => {
+            log::debug!("[hotkey] stop_recording_sync: empty recording (too short or silent)");
+            None
+        }
         Err(e) => {
             log::error!("[hotkey] Failed to stop recording: {}", e);
             None
         }
     };
     drop(recorder);
+    log::debug!("[hotkey] stop_recording_sync: completed in {:?}", t.elapsed());
     play_sound(Sound::Stop, app);
     result
 }
@@ -189,7 +196,8 @@ fn cancel_recording(app: &tauri::AppHandle) {
 fn start_recording(app: &tauri::AppHandle) -> Option<u64> {
     let app_state = app.state::<crate::AppState>();
 
-    let (device_name, limit_secs) = {
+    // Step 1: Read DB settings (lock db, then drop)
+    let (device_setting, limit_secs) = {
         let db = app_state.db.lock().unwrap();
         let device = db.get_setting("microphone_device");
         let limit: u64 = db
@@ -199,9 +207,26 @@ fn start_recording(app: &tauri::AppHandle) -> Option<u64> {
         (device, limit)
     };
 
+    // Step 2: Read device_monitor BEFORE locking audio_recorder (lock ordering: db -> monitor -> recorder)
+    // device_monitor is Arc<DeviceMonitorState> — get_device_id() briefly locks internal Mutex
+    let device_selection = match device_setting.as_deref() {
+        None | Some("auto-detect") => {
+            let monitor_id = app_state.device_monitor.get_device_id();
+            log::debug!("[hotkey] start_recording: auto-detect, monitor_id={:?}", monitor_id);
+            DeviceSelection::AutoDetect(monitor_id)
+        }
+        Some(name) => {
+            log::debug!("[hotkey] start_recording: ByName({})", name);
+            DeviceSelection::ByName(name.to_string())
+        }
+    };
+
+    log::debug!("[hotkey] start_recording: device={:?}, limit={}s", device_selection, limit_secs);
+
+    // Step 3: Lock recorder and start (AFTER reading device_monitor)
     let mut recorder = app_state.audio_recorder.lock().unwrap();
-    if let Err(e) = recorder.start(device_name) {
-        log::error!("Failed to start recording: {}", e);
+    if let Err(e) = recorder.start(device_selection) {
+        log::error!("[hotkey] Failed to start recording: {}", e);
         return None;
     }
     drop(recorder); // explicit drop to release mutex before play_sound acquires db mutex
@@ -248,6 +273,18 @@ pub fn register_hotkey(app: &tauri::App) -> Result<(), Box<dyn std::error::Error
             ContinuousRecording, // Recording in continuous mode (press again to stop)
         }
 
+        impl State {
+            fn name(&self) -> &'static str {
+                match self {
+                    State::Idle => "Idle",
+                    State::PendingHold => "PendingHold",
+                    State::WaitingSecondTap => "WaitingSecondTap",
+                    State::HoldRecording => "HoldRecording",
+                    State::ContinuousRecording => "ContinuousRecording",
+                }
+            }
+        }
+
         let mut state = State::Idle;
         // Timer for tap/hold discrimination and double-tap window
         let mut tap_timer: Option<AsyncJoinHandle> = None;
@@ -264,9 +301,13 @@ pub fn register_hotkey(app: &tauri::App) -> Result<(), Box<dyn std::error::Error
                     match (&state, event) {
                         // --- IDLE ---
                         (State::Idle, HotkeyEvent::Pressed) => {
+                            log::debug!("[hotkey] {} + Pressed → starting recording", state.name());
+                            // Show pill BEFORE start_recording() for instant visual feedback.
+                            // WASAPI init may take 15-40ms on re-init; user sees pill in <5ms.
+                            emit_state(&app_handle, "recording", Some("hold"));
+
                             // EAGER START: begin recording immediately on key-down
                             if let Some(limit_secs) = start_recording(&app_handle) {
-                                emit_state(&app_handle, "recording", Some("hold"));
 
                                 // Spawn recording limit timer
                                 let timer_handle_clone = timer_handle.clone();
@@ -305,6 +346,7 @@ pub fn register_hotkey(app: &tauri::App) -> Result<(), Box<dyn std::error::Error
 
                         // --- PENDING HOLD ---
                         (State::PendingHold, HotkeyEvent::Released) => {
+                            log::debug!("[hotkey] {} + Released → waiting for second tap", state.name());
                             // Released quickly = this was a tap. Wait for second tap.
                             // Recording KEEPS RUNNING — do NOT stop it.
                             if let Some(t) = tap_timer.take() { t.abort(); }
@@ -321,6 +363,7 @@ pub fn register_hotkey(app: &tauri::App) -> Result<(), Box<dyn std::error::Error
 
                         // --- WAITING SECOND TAP ---
                         (State::WaitingSecondTap, HotkeyEvent::Pressed) => {
+                            log::debug!("[hotkey] {} + Pressed → continuous mode", state.name());
                             // Second tap detected → continuous mode!
                             // Recording already running from Idle→PendingHold.
                             // Recording limit timer already running too.
@@ -338,6 +381,7 @@ pub fn register_hotkey(app: &tauri::App) -> Result<(), Box<dyn std::error::Error
 
                         // --- HOLD RECORDING ---
                         (State::HoldRecording, HotkeyEvent::Released) => {
+                            log::debug!("[hotkey] {} + Released → stopping recording", state.name());
                             // Cancel recording limit timer
                             {
                                 let mut th = timer_handle.lock().unwrap();
@@ -356,6 +400,7 @@ pub fn register_hotkey(app: &tauri::App) -> Result<(), Box<dyn std::error::Error
 
                         // --- CONTINUOUS RECORDING ---
                         (State::ContinuousRecording, HotkeyEvent::Pressed) => {
+                            log::debug!("[hotkey] {} + Pressed → stopping recording", state.name());
                             // Hotkey pressed again → stop and process
                             {
                                 let mut th = timer_handle.lock().unwrap();
@@ -379,6 +424,7 @@ pub fn register_hotkey(app: &tauri::App) -> Result<(), Box<dyn std::error::Error
 
                     match (&state, event) {
                         (State::PendingHold, "hold_confirmed") => {
+                            log::debug!("[hotkey] {} + hold_confirmed → HoldRecording", state.name());
                             // User held long enough → confirmed hold mode.
                             // Recording already running from Idle→PendingHold.
                             // Recording limit timer already running too.
@@ -387,6 +433,7 @@ pub fn register_hotkey(app: &tauri::App) -> Result<(), Box<dyn std::error::Error
                             state = State::HoldRecording;
                         }
                         (State::WaitingSecondTap, "single_tap_expired") => {
+                            log::debug!("[hotkey] {} + single_tap_expired → cancelling recording", state.name());
                             // No second tap came → cancel the eagerly-started recording
                             tap_timer = None;
 
@@ -407,6 +454,7 @@ pub fn register_hotkey(app: &tauri::App) -> Result<(), Box<dyn std::error::Error
                         | (State::WaitingSecondTap, "limit_expired")
                         | (State::HoldRecording, "limit_expired")
                         | (State::ContinuousRecording, "limit_expired") => {
+                            log::debug!("[hotkey] {} + limit_expired → stopping recording", state.name());
                             // Recording limit reached — stop and process
                             tap_timer = None;
                             let audio_data = stop_recording_sync(&app_handle);

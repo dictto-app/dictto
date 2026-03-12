@@ -728,7 +728,7 @@ dependencies = [
 
 [[package]]
 name = "dictto"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "arboard",
  "async-trait",
@@ -750,6 +750,7 @@ dependencies = [
  "thiserror 2.0.18",
  "tokio",
  "windows 0.62.2",
+ "windows-core 0.62.2",
  "winreg",
 ]
 

@@ -6,6 +6,7 @@ import { GeneralTab } from "../components/settings/GeneralTab";
 import { AudioTab } from "../components/settings/AudioTab";
 import { ApiTab } from "../components/settings/TranscriptionTab";
 import { LanguageSelectorModal } from "../components/settings/LanguageSelectorModal";
+import { MicrophoneSelectorModal } from "../components/settings/MicrophoneSelectorModal";
 
 const tabs = [
   { id: "general", label: "General" },
@@ -22,6 +23,7 @@ export function SettingsPage() {
   const [apiKeyHint, setApiKeyHint] = useState("");
   const [isMaximized, setIsMaximized] = useState(false);
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
+  const [isMicModalOpen, setIsMicModalOpen] = useState(false);
 
   useEffect(() => {
     loadSettings();
@@ -238,7 +240,11 @@ export function SettingsPage() {
           />
         )}
         {activeTab === "audio" && (
-          <AudioTab settings={settings} onSave={saveSetting} />
+          <AudioTab
+            settings={settings}
+            onSave={saveSetting}
+            onOpenMicModal={() => setIsMicModalOpen(true)}
+          />
         )}
         {activeTab === "api" && (
           <ApiTab
@@ -249,6 +255,17 @@ export function SettingsPage() {
           />
         )}
       </div>
+
+      {/* Microphone Selector Modal — instant-apply on card click */}
+      <MicrophoneSelectorModal
+        isOpen={isMicModalOpen}
+        currentDevice={settings.microphone_device || "auto-detect"}
+        onSave={async (value) => {
+          await saveSetting("microphone_device", value);
+          setIsMicModalOpen(false);
+        }}
+        onClose={() => setIsMicModalOpen(false)}
+      />
 
       {/* Language Selector Modal — backdrop has no onClick (MODAL-07: no save on outside-click) */}
       <LanguageSelectorModal

@@ -97,7 +97,9 @@ impl Database {
 
         // FIRST: migrate existing installs from old 'language' key to new 'languages' JSON array
         self.migrate_language_to_languages()?;
-        // SECOND: insert static defaults (no 'language' entry)
+        // SECOND: migrate existing installs from legacy 'default' device value to 'auto-detect'
+        self.migrate_device_default_to_auto_detect()?;
+        // THIRD: insert static defaults (no 'language' entry)
         self.ensure_defaults()?;
         // THIRD: set locale-detected 'languages' for brand-new installs
         self.ensure_languages_default()?;
@@ -142,6 +144,17 @@ impl Database {
             log::info!("[db] Deleted legacy 'language' key");
         }
 
+        Ok(())
+    }
+
+    /// Migrates the legacy `microphone_device = "default"` value to `"auto-detect"`.
+    /// Only rewrites when the stored value is exactly `"default"`.
+    /// Specific device names and the new `"auto-detect"` value are left untouched.
+    fn migrate_device_default_to_auto_detect(&self) -> Result<(), DbError> {
+        if self.get_setting("microphone_device").as_deref() == Some("default") {
+            self.set_setting("microphone_device", "auto-detect")?;
+            log::info!("[db] Migrated microphone_device 'default' -> 'auto-detect'");
+        }
         Ok(())
     }
 
@@ -219,6 +232,66 @@ impl Database {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // DRES-03: migrate_device_default_to_auto_detect migrates "default" -> "auto-detect"
+    #[test]
+    fn test_migrate_device_default_to_auto_detect() {
+        let db = Database::new_in_memory().expect("in-memory db should open");
+        // Simulate existing install with old "default" value
+        db.set_setting("microphone_device", "default")
+            .expect("set_setting should succeed");
+        db.migrate_device_default_to_auto_detect()
+            .expect("migration should succeed");
+        let result = db.get_setting("microphone_device");
+        assert_eq!(
+            result,
+            Some("auto-detect".to_string()),
+            "microphone_device 'default' should be migrated to 'auto-detect'"
+        );
+    }
+
+    // DRES-03: migration is idempotent — "auto-detect" stays "auto-detect"
+    #[test]
+    fn test_migrate_device_already_auto_detect() {
+        let db = Database::new_in_memory().expect("in-memory db should open");
+        // new_in_memory calls initialize which sets default to "auto-detect"
+        db.migrate_device_default_to_auto_detect()
+            .expect("migration should succeed on already-migrated db");
+        let result = db.get_setting("microphone_device");
+        assert_eq!(
+            result,
+            Some("auto-detect".to_string()),
+            "microphone_device 'auto-detect' should remain unchanged after migration"
+        );
+    }
+
+    // DRES-03: specific device names are preserved (not overwritten)
+    #[test]
+    fn test_migrate_device_specific_name_unchanged() {
+        let db = Database::new_in_memory().expect("in-memory db should open");
+        db.set_setting("microphone_device", "My USB Mic")
+            .expect("set_setting should succeed");
+        db.migrate_device_default_to_auto_detect()
+            .expect("migration should succeed");
+        let result = db.get_setting("microphone_device");
+        assert_eq!(
+            result,
+            Some("My USB Mic".to_string()),
+            "specific device name should be preserved by migration"
+        );
+    }
+
+    // DRES-03: fresh install default is "auto-detect" (not "default")
+    #[test]
+    fn test_fresh_db_default_is_auto_detect() {
+        let db = Database::new_in_memory().expect("in-memory db should open");
+        let result = db.get_setting("microphone_device");
+        assert_eq!(
+            result,
+            Some("auto-detect".to_string()),
+            "fresh install should have 'auto-detect' as microphone_device default (not 'default')"
+        );
+    }
 
     // LANG-01: JSON array storage round-trips correctly in SQLite
     #[test]

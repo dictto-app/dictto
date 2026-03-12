@@ -1,45 +1,95 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import { ComingSoon } from "./ComingSoon";
-
-interface MicrophoneInfo {
-  name: string;
-  is_default: boolean;
-}
 
 interface Props {
   settings: Record<string, string>;
   onSave: (key: string, value: string) => void;
+  onOpenMicModal: () => void;
 }
 
-export function AudioTab({ settings, onSave }: Props) {
-  const [microphones, setMicrophones] = useState<MicrophoneInfo[]>([]);
+function MicrophoneInlineDisplay({
+  microphoneDevice,
+  currentDeviceName,
+}: {
+  microphoneDevice: string | undefined;
+  currentDeviceName: string;
+}) {
+  const isAutoDetect = !microphoneDevice || microphoneDevice === "auto-detect";
+  if (isAutoDetect) {
+    return (
+      <span className="text-xs text-text-secondary">
+        {currentDeviceName
+          ? `Auto-detect (${currentDeviceName.replace(/\s*\([^)]*\)\s*$/, "")})`
+          : "Auto-detect"}
+      </span>
+    );
+  }
+  return <span className="text-xs text-text-secondary">{microphoneDevice}</span>;
+}
 
+export function AudioTab({ settings, onSave: _onSave, onOpenMicModal }: Props) {
+  const [currentDeviceName, setCurrentDeviceName] = useState("");
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  async function fetchCurrentDevice() {
+    try {
+      const name = await invoke<string>("get_current_microphone");
+      setCurrentDeviceName(name);
+    } catch (e) {
+      console.error("Failed to get current microphone:", e);
+    }
+  }
+
+  // Fetch current device name on mount
   useEffect(() => {
-    invoke<MicrophoneInfo[]>("list_microphones")
-      .then(setMicrophones)
-      .catch(console.error);
+    fetchCurrentDevice();
+  }, []);
+
+  // DSEL-05: Listen for audio-devices-changed with 200ms debounce
+  useEffect(() => {
+    const unlistenPromise = listen("audio-devices-changed", () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        fetchCurrentDevice();
+      }, 200);
+    });
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      unlistenPromise.then((fn) => fn());
+    };
   }, []);
 
   return (
     <div className="space-y-6">
       {/* Microphone — functional */}
-      <div>
-        <label className="block text-sm font-medium text-text-secondary mb-2">
-          Microphone
-        </label>
-        <select
-          value={settings.microphone_device || "default"}
-          onChange={(e) => onSave("microphone_device", e.target.value)}
-          className="w-full px-3 py-2 bg-surface border border-border-strong rounded-sm text-sm text-text"
-        >
-          <option value="default">System Default</option>
-          {microphones.map((mic) => (
-            <option key={mic.name} value={mic.name}>
-              {mic.name} {mic.is_default ? "(Default)" : ""}
-            </option>
-          ))}
-        </select>
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-text-secondary">Microphone</p>
+          <p className="text-xs text-text-tertiary">
+            The input device for recording
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <MicrophoneInlineDisplay
+            microphoneDevice={settings.microphone_device}
+            currentDeviceName={currentDeviceName}
+          />
+          <button
+            onClick={(e) => {
+              const btn = e.currentTarget;
+              btn.classList.remove("btn-press");
+              void btn.offsetWidth;
+              btn.classList.add("btn-press");
+              onOpenMicModal();
+            }}
+            className="px-3 py-1.5 bg-surface-elevated border border-border-strong rounded-sm text-xs font-medium text-text-secondary"
+          >
+            Change
+          </button>
+        </div>
       </div>
 
       {/* Noise suppression — Coming Soon */}

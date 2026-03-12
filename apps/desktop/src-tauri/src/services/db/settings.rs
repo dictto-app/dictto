@@ -8,7 +8,7 @@ pub fn default_settings() -> Vec<(&'static str, &'static str)> {
         ("bar_visible_idle", "true"),
         ("bar_opacity", "0.9"),
         ("paste_delay_ms", "150"),
-        ("microphone_device", "default"),
+        ("microphone_device", "auto-detect"),
         ("recording_limit_seconds", "300"),
         ("sound_effects_enabled", "true"),
     ]
