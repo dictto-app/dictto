@@ -58,3 +58,23 @@ jobs:
           releaseDraft: false
           prerelease: ${{ steps.meta.outputs.prerelease == 'true' }}
           includeUpdaterJson: true
+
+      - name: Add fixed-name download asset
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ github.ref_name }}"
+          # Find the versioned .exe in the release
+          EXE_NAME=$(gh release view "$TAG" --json assets --jq '.assets[].name | select(endswith("-setup.exe"))')
+          if [ -z "$EXE_NAME" ]; then
+            echo "No setup exe found in release assets"
+            exit 1
+          fi
+          # Download, rename, and re-upload with fixed name
+          gh release download "$TAG" --pattern "$EXE_NAME" --dir .
+          cp "$EXE_NAME" "Dictto-Setup.exe"
+          # Delete existing fixed-name asset if it exists (for re-runs)
+          gh release delete-asset "$TAG" "Dictto-Setup.exe" --yes 2>/dev/null || true
+          gh release upload "$TAG" "Dictto-Setup.exe"
+          echo "Uploaded Dictto-Setup.exe (copy of $EXE_NAME)"
