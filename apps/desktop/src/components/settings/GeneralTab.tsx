@@ -1,10 +1,12 @@
 import { ComingSoon } from "./ComingSoon";
 import { LANGUAGES, Language } from "../../data/languages";
 import { FlagIcon } from "./FlagIcon";
+import { localeOptions, useT } from "../../i18n";
 
 function LanguageInlineDisplay({ codes }: { codes: string[] }) {
+  const t = useT();
   if (codes.length === 1 && codes[0] === "auto") {
-    return <span className="text-xs text-text-secondary">Auto-detect</span>;
+    return <span className="text-xs text-text-secondary">{t("autoDetect")}</span>;
   }
   const found = codes
     .map((code) => LANGUAGES.find((l) => l.code === code))
@@ -24,10 +26,15 @@ function LanguageInlineDisplay({ codes }: { codes: string[] }) {
           {l.name}
         </span>
       ))}
-      {remainder > 0 && <span className="ml-0.5">&middot; +{remainder} more</span>}
+      {remainder > 0 && (
+        <span className="ml-0.5">&middot; {t("moreLanguages", { n: remainder })}</span>
+      )}
     </span>
   );
 }
+
+const selectClass =
+  "px-3 py-1.5 bg-surface-elevated border border-border-strong rounded-sm text-xs font-medium text-text-secondary";
 
 interface Props {
   settings: Record<string, string>;
@@ -36,13 +43,15 @@ interface Props {
 }
 
 export function GeneralTab({ settings, onSave, onOpenLanguageModal }: Props) {
+  const t = useT();
+
   return (
     <div className="space-y-6">
       {/* Start on boot — functional */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-text-secondary">Start on boot</p>
-          <p className="text-xs text-text-tertiary">Launch Dictto when you sign in</p>
+          <p className="text-sm font-medium text-text-secondary">{t("startOnBoot")}</p>
+          <p className="text-xs text-text-tertiary">{t("startOnBootDesc")}</p>
         </div>
         <button
           onClick={() =>
@@ -63,8 +72,8 @@ export function GeneralTab({ settings, onSave, onOpenLanguageModal }: Props) {
       {/* Sound effects — functional */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-text-secondary">Sound effects</p>
-          <p className="text-xs text-text-tertiary">Play sounds on recording events</p>
+          <p className="text-sm font-medium text-text-secondary">{t("soundEffects")}</p>
+          <p className="text-xs text-text-tertiary">{t("soundEffectsDesc")}</p>
         </div>
         <button
           onClick={() =>
@@ -85,8 +94,8 @@ export function GeneralTab({ settings, onSave, onOpenLanguageModal }: Props) {
       {/* Languages — functional */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-text-secondary">Languages</p>
-          <p className="text-xs text-text-tertiary">The languages you speak</p>
+          <p className="text-sm font-medium text-text-secondary">{t("languages")}</p>
+          <p className="text-xs text-text-tertiary">{t("languagesDesc")}</p>
         </div>
         <div className="flex items-center gap-3">
           <LanguageInlineDisplay codes={(() => {
@@ -103,20 +112,40 @@ export function GeneralTab({ settings, onSave, onOpenLanguageModal }: Props) {
             }}
             className="px-3 py-1.5 bg-surface-elevated border border-border-strong rounded-sm text-xs font-medium text-text-secondary"
           >
-            Change
+            {t("change")}
           </button>
         </div>
+      </div>
+
+      {/* Interface language */}
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-text-secondary">{t("interfaceLanguage")}</p>
+          <p className="text-xs text-text-tertiary">{t("interfaceLanguageDesc")}</p>
+        </div>
+        <select
+          value={settings.ui_locale || "en"}
+          onChange={(e) => onSave("ui_locale", e.target.value)}
+          className={selectClass}
+          style={{ colorScheme: "dark" }}
+        >
+          {localeOptions.map((opt) => (
+            <option key={opt.id} value={opt.id}>
+              {opt.nativeLabel}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Push-to-talk hotkey — Coming Soon */}
       <ComingSoon>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-text-secondary">Push-to-talk hotkey</p>
-            <p className="text-xs text-text-tertiary">Currently: Ctrl+Win</p>
+            <p className="text-sm font-medium text-text-secondary">{t("pushToTalkHotkey")}</p>
+            <p className="text-xs text-text-tertiary">{t("hotkeyCurrently", { hotkey: "Ctrl+Win" })}</p>
           </div>
           <button className="px-3 py-1.5 bg-surface-elevated border border-border-strong rounded-sm text-xs font-medium text-text-secondary">
-            Change
+            {t("change")}
           </button>
         </div>
       </ComingSoon>

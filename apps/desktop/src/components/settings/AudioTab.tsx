@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { ComingSoon } from "./ComingSoon";
+import { useT } from "../../i18n";
 
 interface Props {
   settings: Record<string, string>;
@@ -16,13 +17,13 @@ function MicrophoneInlineDisplay({
   microphoneDevice: string | undefined;
   currentDeviceName: string;
 }) {
+  const t = useT();
   const isAutoDetect = !microphoneDevice || microphoneDevice === "auto-detect";
   if (isAutoDetect) {
+    const shortName = currentDeviceName.replace(/\s*\([^)]*\)\s*$/, "");
     return (
       <span className="text-xs text-text-secondary">
-        {currentDeviceName
-          ? `Auto-detect (${currentDeviceName.replace(/\s*\([^)]*\)\s*$/, "")})`
-          : "Auto-detect"}
+        {shortName ? t("autoDetectDevice", { name: shortName }) : t("autoDetect")}
       </span>
     );
   }
@@ -30,6 +31,7 @@ function MicrophoneInlineDisplay({
 }
 
 export function AudioTab({ settings, onSave: _onSave, onOpenMicModal }: Props) {
+  const t = useT();
   const [currentDeviceName, setCurrentDeviceName] = useState("");
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -67,10 +69,8 @@ export function AudioTab({ settings, onSave: _onSave, onOpenMicModal }: Props) {
       {/* Microphone — functional */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-text-secondary">Microphone</p>
-          <p className="text-xs text-text-tertiary">
-            The input device for recording
-          </p>
+          <p className="text-sm font-medium text-text-secondary">{t("microphone")}</p>
+          <p className="text-xs text-text-tertiary">{t("microphoneDesc")}</p>
         </div>
         <div className="flex items-center gap-3">
           <MicrophoneInlineDisplay
@@ -87,7 +87,7 @@ export function AudioTab({ settings, onSave: _onSave, onOpenMicModal }: Props) {
             }}
             className="px-3 py-1.5 bg-surface-elevated border border-border-strong rounded-sm text-xs font-medium text-text-secondary"
           >
-            Change
+            {t("change")}
           </button>
         </div>
       </div>
@@ -96,8 +96,8 @@ export function AudioTab({ settings, onSave: _onSave, onOpenMicModal }: Props) {
       <ComingSoon>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-text-secondary">Noise suppression</p>
-            <p className="text-xs text-text-tertiary">Filter background noise during recording</p>
+            <p className="text-sm font-medium text-text-secondary">{t("noiseSuppression")}</p>
+            <p className="text-xs text-text-tertiary">{t("noiseSuppressionDesc")}</p>
           </div>
           <div className="relative w-10 h-5 rounded-full bg-surface-elevated">
             <span className="absolute top-0.5 left-0.5 w-4 h-4 bg-text rounded-full" />
@@ -109,8 +109,8 @@ export function AudioTab({ settings, onSave: _onSave, onOpenMicModal }: Props) {
       <ComingSoon>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-text-secondary">Auto-detect silence</p>
-            <p className="text-xs text-text-tertiary">Automatically stop recording after silence</p>
+            <p className="text-sm font-medium text-text-secondary">{t("autoDetectSilence")}</p>
+            <p className="text-xs text-text-tertiary">{t("autoDetectSilenceDesc")}</p>
           </div>
           <div className="relative w-10 h-5 rounded-full bg-surface-elevated">
             <span className="absolute top-0.5 left-0.5 w-4 h-4 bg-text rounded-full" />

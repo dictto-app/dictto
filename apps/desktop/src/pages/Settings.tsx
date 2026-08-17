@@ -7,12 +7,13 @@ import { AudioTab } from "../components/settings/AudioTab";
 import { ApiTab } from "../components/settings/TranscriptionTab";
 import { LanguageSelectorModal } from "../components/settings/LanguageSelectorModal";
 import { MicrophoneSelectorModal } from "../components/settings/MicrophoneSelectorModal";
+import { I18nProvider, resolveLocale, t, type MessageKey } from "../i18n";
 
 const tabs = [
-  { id: "general", label: "General" },
-  { id: "audio", label: "Audio" },
-  { id: "api", label: "API" },
-] as const;
+  { id: "general", labelKey: "tabGeneral" },
+  { id: "audio", labelKey: "tabAudio" },
+  { id: "api", labelKey: "tabApi" },
+] as const satisfies ReadonlyArray<{ id: string; labelKey: MessageKey }>;
 
 type TabId = (typeof tabs)[number]["id"];
 
@@ -123,8 +124,11 @@ export function SettingsPage() {
   };
 
   const win = getCurrentWindow();
+  const locale = resolveLocale(settings.ui_locale);
+  const label = (key: MessageKey) => t(key, locale);
 
   return (
+    <I18nProvider locale={locale}>
     <div className="flex flex-col h-screen bg-bg text-text">
       {/* Integrated header: logo + title + tabs + window controls */}
       <div
@@ -158,7 +162,7 @@ export function SettingsPage() {
             />
           </svg>
           <span className="text-base font-bold tracking-tight text-text" style={{ pointerEvents: "none" }}>
-            Settings
+            {label("settings")}
           </span>
 
           {/* Tab pills */}
@@ -176,7 +180,7 @@ export function SettingsPage() {
                     : "text-text-tertiary"
                 }`}
               >
-                {tab.label}
+                {label(tab.labelKey)}
                 {tab.id === "api" && !hasApiKey && (
                   <span className="inline-flex items-center px-1.5 py-0.5 rounded-xs text-[10px] font-bold leading-none bg-danger/15 text-danger border border-danger/25">
                     !
@@ -195,7 +199,7 @@ export function SettingsPage() {
           <button
             className="flex items-center justify-center w-[46px] self-stretch text-text-tertiary hover:bg-border-strong hover:text-text-secondary cursor-default"
             onClick={(e) => handlePress(e, () => { win.minimize(); })}
-            aria-label="Minimizar"
+            aria-label={label("minimize")}
           >
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5">
               <line x1="0" y1="5" x2="10" y2="5" />
@@ -204,7 +208,7 @@ export function SettingsPage() {
           <button
             className="flex items-center justify-center w-[46px] self-stretch text-text-tertiary hover:bg-border-strong hover:text-text-secondary cursor-default"
             onClick={(e) => handlePress(e, () => { win.toggleMaximize(); })}
-            aria-label={isMaximized ? "Restaurar" : "Maximizar"}
+            aria-label={isMaximized ? label("restore") : label("maximize")}
           >
             {isMaximized ? (
               <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -220,7 +224,7 @@ export function SettingsPage() {
           <button
             className="flex items-center justify-center w-[46px] self-stretch text-text-tertiary hover:bg-danger hover:text-text cursor-default"
             onClick={(e) => handlePress(e, () => { win.close(); })}
-            aria-label="Cerrar"
+            aria-label={label("close")}
           >
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5">
               <line x1="0" y1="0" x2="10" y2="10" />
@@ -278,5 +282,6 @@ export function SettingsPage() {
         onClose={() => setIsLanguageModalOpen(false)}
       />
     </div>
+    </I18nProvider>
   );
 }

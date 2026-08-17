@@ -36,20 +36,20 @@ afterEach(() => {
 
 // DSEL-02: Modal renders header and device cards when open
 describe("DSEL-02: modal visibility and content", () => {
-  it("renders header 'Seleccionar micrófono' when isOpen is true", async () => {
+  it("renders header 'Select microphone' when isOpen is true", async () => {
     await act(async () => {
       render(<MicrophoneSelectorModal {...defaultProps()} />);
     });
 
-    expect(screen.getByText("Seleccionar micrófono")).toBeInTheDocument();
+    expect(screen.getByText("Select microphone")).toBeInTheDocument();
   });
 
-  it("renders subtitle 'Elige el dispositivo de entrada'", async () => {
+  it("renders subtitle 'Choose the input device'", async () => {
     await act(async () => {
       render(<MicrophoneSelectorModal {...defaultProps()} />);
     });
 
-    expect(screen.getByText("Elige el dispositivo de entrada")).toBeInTheDocument();
+    expect(screen.getByText("Choose the input device")).toBeInTheDocument();
   });
 
   it("renders nothing when isOpen is false", () => {
@@ -85,9 +85,9 @@ describe("DSEL-03: auto-detect card", () => {
       render(<MicrophoneSelectorModal {...defaultProps()} />);
     });
 
-    expect(screen.getByText("Auto-detect")).toBeInTheDocument();
+    expect(screen.getByText(/Auto-detect/)).toBeInTheDocument();
     expect(
-      screen.getByText("Sigue el dispositivo predeterminado del sistema")
+      screen.getByText("Follows the system default device")
     ).toBeInTheDocument();
   });
 
@@ -97,7 +97,7 @@ describe("DSEL-03: auto-detect card", () => {
     });
 
     // The auto-detect card should have selected styling
-    const autoDetectCard = screen.getByText("Auto-detect").closest("[data-card]");
+    const autoDetectCard = screen.getByText(/Auto-detect/).closest("[data-card]");
     expect(autoDetectCard).not.toBeNull();
     expect(autoDetectCard!.className).toContain("bg-surface-elevated");
   });
@@ -111,7 +111,7 @@ describe("DSEL-03: auto-detect card", () => {
       );
     });
 
-    const autoDetectCard = screen.getByText("Auto-detect").closest("[data-card]");
+    const autoDetectCard = screen.getByText(/Auto-detect/).closest("[data-card]");
     expect(autoDetectCard).not.toBeNull();
     expect(autoDetectCard!.className).not.toContain("bg-surface-elevated");
   });
@@ -139,7 +139,7 @@ describe("DSEL-04: click interactions", () => {
       render(<MicrophoneSelectorModal {...defaultProps({ onSave })} />);
     });
 
-    const autoCard = screen.getByText("Auto-detect").closest("[data-card]")!;
+    const autoCard = screen.getByText(/Auto-detect/).closest("[data-card]")!;
     await user.click(autoCard);
 
     expect(onSave).toHaveBeenCalledWith("auto-detect");
@@ -323,7 +323,7 @@ describe("DSEL-06: auto-revert on device disconnect", () => {
 
 // Empty state
 describe("empty state", () => {
-  it("shows 'No se encontraron micrófonos' when device list is empty", async () => {
+  it("shows 'No microphones found' when device list is empty", async () => {
     vi.mocked(invoke).mockImplementation((cmd: string) => {
       if (cmd === "list_microphones") return Promise.resolve([]);
       return Promise.resolve(null);
@@ -333,7 +333,7 @@ describe("empty state", () => {
       render(<MicrophoneSelectorModal {...defaultProps()} />);
     });
 
-    expect(screen.getByText("No se encontraron micrófonos")).toBeInTheDocument();
+    expect(screen.getByText("No microphones found")).toBeInTheDocument();
     // Auto-detect card still visible
     expect(screen.getByText("Auto-detect")).toBeInTheDocument();
   });

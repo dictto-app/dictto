@@ -506,4 +506,14 @@ mod tests {
             "history language column should store comma-joined language codes"
         );
     }
+
+    #[test]
+    fn test_fresh_db_default_ui_locale_is_en() {
+        let db = Database::new_in_memory().expect("in-memory db should open");
+        assert_eq!(
+            db.get_setting("ui_locale"),
+            Some("en".to_string()),
+            "fresh install should default the settings UI to English"
+        );
+    }
 }

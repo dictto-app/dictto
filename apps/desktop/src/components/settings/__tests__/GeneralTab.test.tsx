@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GeneralTab } from "../GeneralTab";
+import { I18nProvider } from "../../../i18n";
 
 // Default props factory
 function defaultProps(overrides: Partial<Parameters<typeof GeneralTab>[0]> = {}) {
@@ -43,9 +44,11 @@ describe("SETT-01: languages row display", () => {
       />
     );
 
-    // Should show both language names
-    expect(screen.getByText("Spanish")).toBeInTheDocument();
-    expect(screen.getByText("English")).toBeInTheDocument();
+    const languagesRow = screen
+      .getByText("The languages you speak")
+      .closest(".flex.items-center.justify-between")!;
+    expect(within(languagesRow as HTMLElement).getByText("Spanish")).toBeInTheDocument();
+    expect(within(languagesRow as HTMLElement).getByText("English")).toBeInTheDocument();
   });
 
   it("truncates with +N more when more than 2 languages are selected", () => {
@@ -59,10 +62,12 @@ describe("SETT-01: languages row display", () => {
       />
     );
 
-    // Should show first two languages and +2 more
-    expect(screen.getByText("Spanish")).toBeInTheDocument();
-    expect(screen.getByText("English")).toBeInTheDocument();
-    expect(screen.getByText(/\+2 more/)).toBeInTheDocument();
+    const languagesRow = screen
+      .getByText("The languages you speak")
+      .closest(".flex.items-center.justify-between")!;
+    expect(within(languagesRow as HTMLElement).getByText("Spanish")).toBeInTheDocument();
+    expect(within(languagesRow as HTMLElement).getByText("English")).toBeInTheDocument();
+    expect(within(languagesRow as HTMLElement).getByText(/\+2 more/)).toBeInTheDocument();
   });
 
   it("renders the Languages row between Sound effects and Push-to-talk", () => {
@@ -108,5 +113,33 @@ describe("SETT-02: Change button opens modal", () => {
     await user.click(changeBtn);
 
     expect(onOpenLanguageModal).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("interface language", () => {
+  it("renders interface language select defaulting to English", () => {
+    render(<GeneralTab {...defaultProps()} />);
+
+    expect(screen.getByText("Interface language")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("English")).toBeInTheDocument();
+  });
+
+  it("saves ui_locale when the language select changes", async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn();
+    render(<GeneralTab {...defaultProps({ onSave })} />);
+
+    await user.selectOptions(screen.getByDisplayValue("English"), "zh");
+    expect(onSave).toHaveBeenCalledWith("ui_locale", "zh");
+  });
+
+  it("renders Chinese labels when wrapped in the zh provider", () => {
+    render(
+      <I18nProvider locale="zh">
+        <GeneralTab {...defaultProps()} />
+      </I18nProvider>
+    );
+
+    expect(screen.getByText("界面语言")).toBeInTheDocument();
   });
 });
