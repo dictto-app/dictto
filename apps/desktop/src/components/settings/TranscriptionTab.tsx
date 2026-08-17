@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useT } from "../../i18n";
 
 interface ApiTabProps {
   hasApiKey: boolean;
@@ -15,6 +16,7 @@ export function ApiTab({
   onSaveApiKey,
   onRemoveApiKey,
 }: ApiTabProps) {
+  const t = useT();
   const [view, setView] = useState<KeyView>(hasApiKey ? "display" : "input");
   const [apiKey, setApiKey] = useState("");
   const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
@@ -36,10 +38,10 @@ export function ApiTab({
       <div>
         <div className="flex items-center gap-2 mb-2">
           <span className="text-xs font-semibold text-text-secondary">
-            OpenAI API Key
+            {t("openaiApiKey")}
           </span>
           <span className="inline-flex items-center px-2 py-0.5 rounded-xs text-[10px] font-bold leading-none bg-danger/15 text-danger border border-danger/25">
-            Required
+            {t("required")}
           </span>
         </div>
         <div className="flex items-center gap-2.5">
@@ -60,11 +62,11 @@ export function ApiTab({
             }}
             className="px-4 py-2.5 bg-text text-bg rounded-md text-xs font-semibold shrink-0"
           >
-            Save Key
+            {t("saveKey")}
           </button>
         </div>
         <p className="text-[11px] text-text-tertiary mt-2 leading-relaxed">
-          Required for transcription and text cleanup.
+          {t("apiKeyRequiredHint")}
         </p>
       </div>
     );
@@ -75,7 +77,7 @@ export function ApiTab({
     return (
       <div>
         <div className="text-xs font-semibold text-text-secondary mb-2">
-          OpenAI API Key
+          {t("openaiApiKey")}
         </div>
         <div className="flex items-center gap-2.5">
           <input
@@ -96,7 +98,7 @@ export function ApiTab({
             }}
             className="px-4 py-2.5 bg-text text-bg rounded-md text-xs font-semibold shrink-0"
           >
-            Save Key
+            {t("saveKey")}
           </button>
         </div>
         <div className="mt-3 flex gap-2">
@@ -108,7 +110,7 @@ export function ApiTab({
             }}
             className="px-4 py-1.5 bg-surface-elevated border border-border-strong rounded-md text-xs font-semibold text-text"
           >
-            Cancel
+            {t("cancel")}
           </button>
         </div>
       </div>
@@ -119,7 +121,7 @@ export function ApiTab({
   return (
     <div>
       <div className="text-xs font-semibold text-text-secondary mb-2">
-        OpenAI API Key
+        {t("openaiApiKey")}
       </div>
       <div className="flex items-center gap-2.5">
         <input
@@ -130,7 +132,7 @@ export function ApiTab({
         />
         <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-accent bg-accent-bg border border-accent-border px-3 py-1 rounded-xs shrink-0">
           <div className="w-[5px] h-[5px] rounded-full bg-accent" />
-          Configured
+          {t("configured")}
         </div>
       </div>
       <div className="mt-3 flex gap-2">
@@ -141,7 +143,7 @@ export function ApiTab({
           }}
           className="px-4 py-1.5 bg-surface-elevated border border-border-strong rounded-md text-xs font-semibold text-text"
         >
-          Update Key
+          {t("updateKey")}
         </button>
         <button
           onClick={(e) => {
@@ -150,14 +152,14 @@ export function ApiTab({
           }}
           className="px-4 py-1.5 bg-transparent rounded-md text-xs font-semibold text-danger"
         >
-          Remove
+          {t("remove")}
         </button>
       </div>
 
       {showRemoveConfirm && (
         <div className="mt-4 p-3 bg-surface border border-border-strong rounded-sm">
           <p className="text-sm text-text-secondary mb-3">
-            Are you sure? Dictto won't work without an API key.
+            {t("removeApiKeyConfirm")}
           </p>
           <div className="flex gap-2">
             <button
@@ -168,7 +170,7 @@ export function ApiTab({
               }}
               className="px-4 py-1.5 bg-danger text-white rounded-md text-xs font-semibold"
             >
-              Yes, remove
+              {t("yesRemove")}
             </button>
             <button
               onClick={(e) => {
@@ -177,7 +179,7 @@ export function ApiTab({
               }}
               className="px-4 py-1.5 bg-surface-elevated border border-border-strong rounded-md text-xs font-semibold text-text"
             >
-              Cancel
+              {t("cancel")}
             </button>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, act } from "@testing-library/react";
+import { render, screen, act, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
@@ -17,7 +17,7 @@ beforeEach(() => {
     if (cmd === "get_all_settings") {
       return { languages: JSON.stringify(["es", "en"]) } as Record<string, string>;
     }
-    if (cmd === "has_api_key") return false;
+    if (cmd === "has_api_key") return true;
     if (cmd === "set_setting") return null;
     return null;
   });
@@ -60,9 +60,12 @@ describe("SETT-03: row updates live after modal save", () => {
       await new Promise((r) => setTimeout(r, 50));
     });
 
-    // Verify initial state shows Spanish and English
-    expect(screen.getByText("Spanish")).toBeInTheDocument();
-    expect(screen.getByText("English")).toBeInTheDocument();
+    // Verify initial state shows Spanish and English in the dictation-languages row
+    const languagesRow = screen
+      .getByText("The languages you speak")
+      .closest(".flex.items-center.justify-between") as HTMLElement;
+    expect(within(languagesRow).getByText("Spanish")).toBeInTheDocument();
+    expect(within(languagesRow).getByText("English")).toBeInTheDocument();
 
     // Simulate a setting-changed event (e.g., after modal save changes languages to French+German)
     expect(settingChangedCallback).not.toBeNull();
@@ -77,8 +80,11 @@ describe("SETT-03: row updates live after modal save", () => {
     });
 
     // The display should now show French and German
-    expect(screen.getByText("French")).toBeInTheDocument();
-    expect(screen.getByText("German")).toBeInTheDocument();
+    const updatedRow = screen
+      .getByText("The languages you speak")
+      .closest(".flex.items-center.justify-between") as HTMLElement;
+    expect(within(updatedRow).getByText("French")).toBeInTheDocument();
+    expect(within(updatedRow).getByText("German")).toBeInTheDocument();
   });
 
   it("opens the language modal when Change is clicked and closes after save", async () => {
@@ -114,5 +120,32 @@ describe("SETT-03: row updates live after modal save", () => {
       key: "languages",
       value: expect.any(String),
     });
+  });
+});
+
+describe("interface language", () => {
+  it("renders Chinese chrome when ui_locale is zh", async () => {
+    mockInvoke.mockImplementation(async (cmd: string) => {
+      if (cmd === "get_all_settings") {
+        return {
+          languages: JSON.stringify(["es", "en"]),
+          ui_locale: "zh",
+        } as Record<string, string>;
+      }
+      if (cmd === "has_api_key") return true;
+      return null;
+    });
+
+    await act(async () => {
+      render(<SettingsPage />);
+    });
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 50));
+    });
+
+    expect(screen.getByText("设置")).toBeInTheDocument();
+    expect(screen.getByText("通用")).toBeInTheDocument();
+    expect(screen.getByText("界面语言")).toBeInTheDocument();
   });
 });

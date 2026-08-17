@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import { useT } from "../../i18n";
 
 interface MicrophoneInfo {
   name: string;
@@ -22,6 +23,7 @@ export function MicrophoneSelectorModal({
   onSave,
   onClose,
 }: MicrophoneSelectorModalProps) {
+  const t = useT();
   const [devices, setDevices] = useState<MicrophoneInfo[]>([]);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -104,9 +106,9 @@ export function MicrophoneSelectorModal({
       >
         {/* Header */}
         <div className="px-5 py-4 border-b border-border shrink-0">
-          <h2 className="text-base font-bold text-text">Select microphone</h2>
+          <h2 className="text-base font-bold text-text">{t("selectMicrophone")}</h2>
           <p className="text-xs text-text-tertiary mt-0.5">
-            Choose the input device
+            {t("selectMicrophoneDesc")}
           </p>
         </div>
 
@@ -124,19 +126,21 @@ export function MicrophoneSelectorModal({
           >
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-text">
-                Auto-detect{defaultShortName ? ` (${defaultShortName})` : ""}
+                {defaultShortName
+                  ? t("autoDetectDevice", { name: defaultShortName })
+                  : t("autoDetect")}
               </span>
-              <span className="text-xs text-accent font-medium">Auto</span>
+              <span className="text-xs text-accent font-medium">{t("auto")}</span>
             </div>
             <p className="text-xs text-text-tertiary mt-0.5">
-              Follows the system default device
+              {t("followsSystemDefault")}
             </p>
           </div>
 
           {/* Device cards */}
           {devices.length === 0 ? (
             <div className="py-6 text-center">
-              <p className="text-sm text-text-tertiary">No microphones found</p>
+              <p className="text-sm text-text-tertiary">{t("noMicrophonesFound")}</p>
             </div>
           ) : (
             devices.map((mic) => {

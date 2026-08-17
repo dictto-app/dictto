@@ -11,5 +11,6 @@ pub fn default_settings() -> Vec<(&'static str, &'static str)> {
         ("microphone_device", "auto-detect"),
         ("recording_limit_seconds", "300"),
         ("sound_effects_enabled", "true"),
+        ("ui_locale", "en"),
     ]
 }

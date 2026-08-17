@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { LANGUAGES, Language } from "../../data/languages";
 import { FlagIcon } from "./FlagIcon";
+import { useT } from "../../i18n";
 
 interface LanguageSelectorModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ export function LanguageSelectorModal({
   onSave,
   onClose,
 }: LanguageSelectorModalProps) {
+  const t = useT();
   const [draft, setDraft] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [autoDetect, setAutoDetect] = useState(false);
@@ -108,20 +110,20 @@ export function LanguageSelectorModal({
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
           <div>
-            <h2 className="text-base font-bold text-text">Languages</h2>
+            <h2 className="text-base font-bold text-text">{t("languages")}</h2>
             <p className="text-xs text-text-tertiary mt-0.5">
-              Select the languages you want to use with Dictto
+              {t("languagesModalDesc")}
             </p>
           </div>
           {/* Auto-detect toggle */}
           <div className="flex items-center gap-3">
-            <span className="text-xs text-text-secondary font-medium">Auto-detect</span>
+            <span className="text-xs text-text-secondary font-medium">{t("autoDetect")}</span>
             <button
               onClick={handleAutoDetectToggle}
               className={`relative w-10 h-5 rounded-full transition-colors ${
                 autoDetect ? "bg-accent" : "bg-surface-elevated"
               }`}
-              aria-label="Auto-detect toggle"
+              aria-label={t("autoDetectToggle")}
             >
               <span
                 className={`absolute top-0.5 left-0.5 w-4 h-4 bg-text rounded-full transition-transform ${
@@ -138,7 +140,7 @@ export function LanguageSelectorModal({
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search for any language..."
+            placeholder={t("searchLanguages")}
             className="w-full bg-surface border border-border rounded-sm text-sm text-text px-3 py-2 outline-none placeholder:text-text-tertiary"
             style={
               autoDetect
@@ -179,10 +181,10 @@ export function LanguageSelectorModal({
           {/* Sidebar */}
           <div className="flex-[1] border-l border-border overflow-y-auto p-4">
             <p className="text-xs font-semibold text-text-secondary uppercase tracking-wide mb-3">
-              Selected
+              {t("selected")}
             </p>
             {selectedLanguages.length === 0 ? (
-              <p className="text-xs text-text-tertiary">No languages selected</p>
+              <p className="text-xs text-text-tertiary">{t("noLanguagesSelected")}</p>
             ) : (
               <div className="space-y-2">
                 {selectedLanguages.map((lang) => (
@@ -199,7 +201,7 @@ export function LanguageSelectorModal({
         {/* Footer */}
         <div className="flex items-center justify-between px-5 py-3 border-t border-border shrink-0">
           {isDisabled ? (
-            <p className="text-xs text-text-tertiary">Select at least one language</p>
+            <p className="text-xs text-text-tertiary">{t("selectAtLeastOneLanguage")}</p>
           ) : (
             <span />
           )}
@@ -210,7 +212,7 @@ export function LanguageSelectorModal({
               isDisabled ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
-            Save and close
+            {t("saveAndClose")}
           </button>
         </div>
       </div>

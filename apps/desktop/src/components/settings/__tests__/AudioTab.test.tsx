@@ -29,32 +29,32 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-// DSEL-01: Inline row with label, description, device name, and Cambiar button
+// DSEL-01: Inline row with label, description, device name, and Change button
 describe("DSEL-01: inline microphone row display", () => {
-  it("renders 'Micrófono' label", async () => {
+  it("renders 'Microphone' label", async () => {
     await act(async () => {
       render(<AudioTab {...defaultProps()} />);
     });
 
-    expect(screen.getByText("Micrófono")).toBeInTheDocument();
+    expect(screen.getByText("Microphone")).toBeInTheDocument();
   });
 
-  it("renders description 'El dispositivo de entrada para grabar'", async () => {
+  it("renders description 'The input device for recording'", async () => {
     await act(async () => {
       render(<AudioTab {...defaultProps()} />);
     });
 
     expect(
-      screen.getByText("El dispositivo de entrada para grabar")
+      screen.getByText("The input device for recording")
     ).toBeInTheDocument();
   });
 
-  it("renders 'Cambiar' button", async () => {
+  it("renders 'Change' button", async () => {
     await act(async () => {
       render(<AudioTab {...defaultProps()} />);
     });
 
-    expect(screen.getByText("Cambiar")).toBeInTheDocument();
+    expect(screen.getByText("Change")).toBeInTheDocument();
   });
 
   it("shows 'Auto-detect (Headset Microphone)' when microphone_device is 'auto-detect'", async () => {
@@ -95,16 +95,16 @@ describe("DSEL-01: inline microphone row display", () => {
   });
 });
 
-// DSEL-01: Cambiar button calls onOpenMicModal
-describe("DSEL-01: Cambiar button callback", () => {
-  it("calls onOpenMicModal when Cambiar is clicked", async () => {
+// DSEL-01: Change button calls onOpenMicModal
+describe("DSEL-01: Change button callback", () => {
+  it("calls onOpenMicModal when Change is clicked", async () => {
     const user = userEvent.setup();
     const onOpenMicModal = vi.fn();
     await act(async () => {
       render(<AudioTab {...defaultProps({ onOpenMicModal })} />);
     });
 
-    const btn = screen.getByText("Cambiar");
+    const btn = screen.getByText("Change");
     await user.click(btn);
 
     expect(onOpenMicModal).toHaveBeenCalledTimes(1);

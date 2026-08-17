@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type CSSProperties } from "react";
 import { getCurrentWindow, currentMonitor } from "@tauri-apps/api/window";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { LogicalSize, LogicalPosition } from "@tauri-apps/api/dpi";
@@ -7,6 +7,7 @@ import { listen } from "@tauri-apps/api/event";
 import { useRecording } from "../../hooks/useRecording";
 import { ContinuousControls } from "./ContinuousControls";
 import { StatusIndicator } from "./StatusIndicator";
+import { useT } from "../../i18n";
 
 interface RecordingBarProps {
   barVisibleIdle: boolean;
@@ -35,7 +36,7 @@ const PILL = {
 } as const;
 
 // Pre-computed tooltip dimensions for the idle hover tooltip.
-// Text: "Click or hold Ctrl + Win to start dictating" at fontSize:13, padding:10px 20px.
+// Sized for both English and Chinese strings at fontSize:13, padding:10px 20px.
 // These constants prevent the first-hover window resize flicker caused by
 // non-atomic setSize+setPosition in Tauri (see CLAUDE.md).
 const TOOLTIP = {
@@ -118,8 +119,28 @@ interface MonitorInfo {
   scaleFactor: number;
 }
 
+const HOTKEY_LABEL = "Ctrl + Win";
+const kbdStyle: CSSProperties = {
+  fontWeight: 700,
+  color: "var(--color-text)",
+  fontSize: 13,
+  fontFamily: "inherit",
+};
+
+function HotkeyHint({ template }: { template: string }) {
+  const [before, after] = template.split("{hotkey}");
+  return (
+    <>
+      {before}
+      <kbd style={kbdStyle}>{HOTKEY_LABEL}</kbd>
+      {after}
+    </>
+  );
+}
+
 
 export function RecordingBar({ barVisibleIdle, barOpacity }: RecordingBarProps) {
+  const t = useT();
   const { recordingState, recordingMode } = useRecording();
   const [isHovered, setIsHovered] = useState(false);
   const [isToggleHovered, setIsToggleHovered] = useState(false);
@@ -463,7 +484,7 @@ export function RecordingBar({ barVisibleIdle, barOpacity }: RecordingBarProps) 
               boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
             }}
           >
-            Click or hold <kbd style={{ fontWeight: 700, color: "var(--color-text)", fontSize: 13, fontFamily: "inherit" }}>Ctrl + Win</kbd> to start dictating
+            <HotkeyHint template={t("barIdleTooltip")} />
             <div
               style={{
                 position: "absolute",
@@ -505,7 +526,7 @@ export function RecordingBar({ barVisibleIdle, barOpacity }: RecordingBarProps) 
               boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
             }}
           >
-            Press <kbd style={{ fontWeight: 700, color: "var(--color-text)", fontSize: 13, fontFamily: "inherit" }}>Ctrl + Win</kbd> again to stop dictating
+            <HotkeyHint template={t("barStopTooltip")} />
             <div
               style={{
                 position: "absolute",
