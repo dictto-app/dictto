@@ -115,9 +115,54 @@ Read the full [Privacy Policy →](PRIVACY.md)
 | **Desktop framework** | [Tauri v2](https://v2.tauri.app/) (Rust backend + WebView frontend) |
 | **Frontend** | React 19 + TypeScript + TailwindCSS v4 |
 | **Audio capture** | WASAPI (native Windows audio via Microsoft `windows` crate) |
-| **Transcription** | [OpenAI Whisper API](https://platform.openai.com/docs/guides/speech-to-text) (BYOK) |
+| **Transcription** | [OpenAI Whisper API](https://platform.openai.com/docs/guides/speech-to-text) (BYOK, default) — or **local, offline NVIDIA Parakeet TDT** via ONNX Runtime (opt-in, see below) |
 | **Text cleanup** | [OpenAI GPT](https://platform.openai.com/docs/guides/text-generation) (BYOK) |
 | **Local storage** | SQLite (settings + history) + Windows Credential Locker (API key) |
+
+## Local Transcription (Parakeet, offline, no API key)
+
+By default Dictto sends audio to the OpenAI Whisper API using your own key.
+If you'd rather transcribe **entirely on-device** — no network call, no API
+key, no audio ever leaving your PC — you can switch to NVIDIA's **Parakeet
+TDT** model instead, run locally through [ONNX Runtime](https://onnxruntime.ai/)
+via the [`parakeet-rs`](https://docs.rs/parakeet-rs) crate.
+
+This is the same model family used by macOS dictation tools like FluidVoice
+(there via Apple's MLX runtime); here it runs cross-platform via ONNX Runtime,
+which works on Windows out of the box.
+
+### Setup
+
+1. **Build with the `local-transcription` feature enabled:**
+   ```bash
+   cd apps/desktop/src-tauri
+   cargo build --features local-transcription
+   ```
+   (This feature is off by default so the standard build stays lean for users
+   who only want the OpenAI path — the `parakeet-rs`/ONNX Runtime dependency
+   is only pulled in when you opt in.)
+
+2. **Download a Parakeet TDT ONNX model bundle.** A ready-to-use export is
+   published at [`istupakov/parakeet-tdt-0.6b-v3-onnx`](https://huggingface.co/istupakov/parakeet-tdt-0.6b-v3-onnx)
+   on Hugging Face. Download the full folder (it needs `model.onnx`,
+   `model.onnx_data`, `config.json`, `preprocessor_config.json`,
+   `tokenizer.json`, and `tokenizer_config.json` together in one directory).
+
+3. **In Dictto's Settings → API tab:**
+   - Select **"Parakeet (local, offline)"** as the Transcription Engine
+   - Paste the path to the folder from step 2 into the model path field
+   - Your OpenAI key becomes optional at that point — it's only used for the
+     GPT text-cleanup step afterward; if you skip it, Dictto pastes the raw
+     Parakeet transcript instead.
+
+### Notes
+
+- CPU inference is the default and most reliable path. `parakeet-rs` also
+  supports CUDA/TensorRT/DirectML acceleration on supported hardware via
+  additional Cargo features — see the crate's docs if you want GPU speedup.
+- Accuracy is comparable to (often better than) Whisper on real-world audio,
+  and it handles mixed-language speech (e.g. code-switching between two
+  languages mid-sentence) noticeably well.
 
 ## Build from Source
 

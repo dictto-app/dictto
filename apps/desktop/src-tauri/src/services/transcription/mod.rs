@@ -1,5 +1,8 @@
 pub mod openai_api;
 
+#[cfg(feature = "local-transcription")]
+pub mod parakeet_local;
+
 use async_trait::async_trait;
 
 pub struct TranscriptionConfig {

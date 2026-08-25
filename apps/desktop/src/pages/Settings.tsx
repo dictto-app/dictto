@@ -252,6 +252,10 @@ export function SettingsPage() {
             apiKeyHint={apiKeyHint}
             onSaveApiKey={saveApiKey}
             onRemoveApiKey={removeApiKey}
+            transcriptionEngine={settings.transcription_engine || "openai_api"}
+            parakeetModelDir={settings.parakeet_model_dir || ""}
+            onSaveTranscriptionEngine={(engine) => saveSetting("transcription_engine", engine)}
+            onSaveParakeetModelDir={(dir) => saveSetting("parakeet_model_dir", dir)}
           />
         )}
       </div>
