@@ -2,6 +2,7 @@ pub fn default_settings() -> Vec<(&'static str, &'static str)> {
     vec![
         ("hotkey", "Ctrl+Win"),
         ("transcription_engine", "openai_api"),
+        ("parakeet_model_dir", ""),
         ("llm_provider", "openai_gpt"),
         ("llm_model", "gpt-4.1-nano"),
         ("auto_start", "true"),

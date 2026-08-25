@@ -34,6 +34,14 @@ log = { version = "0.4", features = ["max_level_debug", "release_max_level_warn"
 tauri-plugin-log = "2"
 winreg = "0.55"
 
+# Local, offline transcription engine (NVIDIA Parakeet TDT via ONNX Runtime).
+# Optional so the default build stays lean for users who only want the
+# OpenAI Whisper API path; enable with `--features local-transcription`.
+parakeet-rs = { version = "0.3", optional = true }
+
+[features]
+local-transcription = ["dep:parakeet-rs"]
+
 [target.'cfg(windows)'.dependencies]
 windows-core = "0.62"
 windows = { version = "0.62", features = [
